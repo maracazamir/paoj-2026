@@ -21,6 +21,11 @@ public class Main {
             case "by_salary_desc" -> (Angajat a1, Angajat a2) -> Double.compare(a2.getSalariu(), a1.getSalariu());
             default -> (a1, a2) -> 0; // nu sortam
         };
+        if (comparator != null) {
+            Arrays.sort(angajati, comparator);
+        } else {
+            Arrays.sort(angajati);
+        }
         Arrays.sort(angajati, comparator);
         for (Angajat angajat : angajati) {
             System.out.println(angajat);
