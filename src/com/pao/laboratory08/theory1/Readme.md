@@ -102,7 +102,7 @@ public class Student implements Serializable {
     private static final long serialVersionUID = 1L;
     private String nume;
     private Adresa adresa;  // OK — Adresa e Serializable
-}
+}6
 ```
 
 Dacă `Adresa` nu este `Serializable`, se aruncă `NotSerializableException` la runtime.
