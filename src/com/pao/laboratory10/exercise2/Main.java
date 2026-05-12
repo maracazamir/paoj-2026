@@ -37,6 +37,109 @@ public class Main {
         // Format linie tranzacție: [id] data tip: suma RON
         //   Ex: [1] 2024-01-15 CREDIT: 1500.00 RON
 
-        System.out.println("TODO: implementează exercițiul 2");
+        Scanner sc = new Scanner(System.in);
+        sc.useLocale(Locale.US);
+
+        int n = sc.nextInt();
+
+        ArrayList<Tranzactie> lista = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+            int id = sc.nextInt();
+            double suma = sc.nextDouble();
+            String data = sc.next();
+            TipTranzactie tip = TipTranzactie.valueOf(sc.next());
+
+            lista.add(new Tranzactie(id, suma, data, tip));
+        }
+
+        Comparator<Tranzactie> dupaSuma =
+                Comparator.comparingDouble(Tranzactie::getSuma);
+
+        while (sc.hasNext()) {
+            String comanda = sc.next();
+
+            if (comanda.equals("UNIQUE_IDS")) {
+                LinkedHashSet<Integer> ids = new LinkedHashSet<>();
+
+                for (Tranzactie t : lista) {
+                    ids.add(t.getId());
+                }
+
+                System.out.println("IDs unice (" + ids.size() + "): " + ids);
+
+            } else if (comanda.equals("MONTHLY_REPORT")) {
+                TreeMap<String, double[]> raport = new TreeMap<>();
+
+                for (Tranzactie t : lista) {
+                    String luna = t.getData().substring(0, 7);
+                    raport.putIfAbsent(luna, new double[2]);
+
+                    if (t.getTip() == TipTranzactie.CREDIT) {
+                        raport.get(luna)[0] += t.getSuma();
+                    } else {
+                        raport.get(luna)[1] += t.getSuma();
+                    }
+                }
+
+                for (Map.Entry<String, double[]> entry : raport.entrySet()) {
+                    double[] sume = entry.getValue();
+
+                    System.out.printf(
+                            Locale.US,
+                            "%s: CREDIT %.2f RON, DEBIT %.2f RON%n",
+                            entry.getKey(),
+                            sume[0],
+                            sume[1]
+                    );
+                }
+
+            } else if (comanda.equals("TOP")) {
+                int topN = sc.nextInt();
+
+                ArrayList<Tranzactie> copie = new ArrayList<>(lista);
+                copie.sort(dupaSuma.reversed());
+
+                System.out.println("Top " + topN + ":");
+
+                for (int i = 0; i < topN && i < copie.size(); i++) {
+                    System.out.println(copie.get(i));
+                }
+
+            } else if (comanda.equals("SORT_ASC")) {
+                Collections.sort(lista, dupaSuma);
+                afiseazaLista(lista);
+
+            } else if (comanda.equals("SORT_DESC")) {
+                Collections.sort(lista, dupaSuma.reversed());
+                afiseazaLista(lista);
+
+            } else if (comanda.equals("REVERSE")) {
+                Collections.reverse(lista);
+                afiseazaLista(lista);
+
+            } else if (comanda.equals("MIN_MAX")) {
+                Tranzactie min = Collections.min(lista, dupaSuma);
+                Tranzactie max = Collections.max(lista, dupaSuma);
+
+                System.out.println("MIN: " + min);
+                System.out.println("MAX: " + max);
+
+            } else if (comanda.equals("CME_DEMO")) {
+                try {
+                    for (Tranzactie t : lista) {
+                        lista.remove(t);
+                    }
+                } catch (ConcurrentModificationException e) {
+                    System.out.println("ConcurrentModificationException prins: modificare in iteratie detectata.");
+                }
+            }
+        }
+    }
+
+    private static void afiseazaLista(List<Tranzactie> lista) {
+        for (Tranzactie t : lista) {
+            System.out.println(t);
+        }
     }
 }
